@@ -10,4 +10,18 @@
     <string name="error">Unknown error!</string>
     <string name="login">No session, login!</string>
     <string name="button_press">%1$s is pressed.</string>
+    
+    <!-- Voice control strings -->
+    <string name="voice_title">Sprachsteuerung</string>
+    <string name="voice_initializing">Wird vorbereitet...</string>
+    <string name="voice_listening">Ich höre zu...</string>
+    <string name="voice_processing">Wird ausgeführt...</string>
+    <string name="voice_permission_denied">Mikrofon-Berechtigung benötigt</string>
+    <string name="voice_no_match">Nichts erkannt</string>
+    <string name="voice_network_error">Netzwerkfehler</string>
+    <string name="voice_audio_error">Audiofehler</string>
+    <string name="voice_timeout">Zeitüberschreitung</string>
+    <string name="voice_error_generic">Ein Fehler ist aufgetreten</string>
+    <string name="voice_retry">Wiederholen</string>
+    <string name="complication_label">Homey Sprache</string>
 </resources>

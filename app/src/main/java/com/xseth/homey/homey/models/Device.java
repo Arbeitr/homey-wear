@@ -47,6 +47,16 @@ public class Device {
     @NonNull
     public String capability;
 
+    // Zone ID where this device is located
+    @SerializedName("zone")
+    private String zoneId;
+
+    // Zone name (mapped from zones)
+    private String zoneName;
+
+    // Cached target temperature for relative changes
+    private Double cachedTargetTemperature;
+
     // Capabilities Object returned by API
     @Ignore
     @SerializedName("capabilitiesObj")
@@ -198,6 +208,54 @@ public class Device {
      */
     public boolean isButton(){
         return this.getCapability().equals("button");
+    }
+
+    /**
+     * Get zone ID
+     * @return zone ID where device is located
+     */
+    public String getZoneId() {
+        return zoneId;
+    }
+
+    /**
+     * Set zone ID
+     * @param zoneId zone ID to set
+     */
+    public void setZoneId(String zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    /**
+     * Get zone name
+     * @return zone name
+     */
+    public String getZoneName() {
+        return zoneName;
+    }
+
+    /**
+     * Set zone name
+     * @param zoneName zone name to set
+     */
+    public void setZoneName(String zoneName) {
+        this.zoneName = zoneName;
+    }
+
+    /**
+     * Get cached target temperature
+     * @return cached target temperature
+     */
+    public Double getCachedTargetTemperature() {
+        return cachedTargetTemperature;
+    }
+
+    /**
+     * Set cached target temperature
+     * @param cachedTargetTemperature target temperature to cache
+     */
+    public void setCachedTargetTemperature(Double cachedTargetTemperature) {
+        this.cachedTargetTemperature = cachedTargetTemperature;
     }
 
     /**

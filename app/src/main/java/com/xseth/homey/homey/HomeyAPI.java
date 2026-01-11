@@ -309,4 +309,68 @@ public class HomeyAPI {
                 jsonParams
         );
     }
+
+    /**
+     * Get all zones
+     * @return map of zones
+     */
+    public Map<String, Zone> getZones() {
+        try {
+            Call<Map<String, Zone>> call = homeyService.getZones();
+            return call.execute().body();
+        } catch (IOException ioe) {
+            Timber.e(ioe, "Failed to retrieve zones");
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * Get all flows
+     * @return map of flows
+     */
+    public Map<String, Flow> getFlows() {
+        try {
+            Call<Map<String, Flow>> call = homeyService.getFlows();
+            return call.execute().body();
+        } catch (IOException ioe) {
+            Timber.e(ioe, "Failed to retrieve flows");
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * Trigger a flow
+     * @param flowId flow ID to trigger
+     */
+    public Call<Void> triggerFlow(String flowId) {
+        return homeyService.triggerFlow(flowId);
+    }
+
+    /**
+     * Get a specific device
+     * @param deviceId device ID
+     * @return device
+     */
+    public Device getDevice(String deviceId) {
+        try {
+            Call<Device> call = homeyService.getDevice(deviceId);
+            return call.execute().body();
+        } catch (IOException ioe) {
+            Timber.e(ioe, "Failed to retrieve device");
+            return null;
+        }
+    }
+
+    /**
+     * Set capability value for a device
+     * @param deviceId device ID
+     * @param capabilityId capability ID
+     * @param value value to set
+     * @return result
+     */
+    public Call<Map<String, Object>> setCapabilityValue(String deviceId, String capabilityId, Object value) {
+        Map<String, Object> jsonParams = new HashMap<>();
+        jsonParams.put("value", value);
+        return homeyService.setCapabilityValue(deviceId, capabilityId, jsonParams);
+    }
 }

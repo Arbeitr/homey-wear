@@ -181,6 +181,10 @@ public class MainActivity extends FragmentActivity implements MenuItem.OnMenuIte
 
             // Device refreshed, remove loading
             runOnUiThread(() -> onOffAdapter.setLoading(false));
+        } else if (itemId == R.id.voice_control) {
+            // Launch voice activity
+            Intent intent = new Intent(this, com.xseth.homey.voice.VoiceActivity.class);
+            startActivity(intent);
         }
 
         drawer.getController().closeDrawer();
