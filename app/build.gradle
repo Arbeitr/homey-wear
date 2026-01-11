@@ -89,9 +89,6 @@ dependencies {
     // Logging
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
-    // Complications
-    implementation 'androidx.wear.watchface:watchface-complications-data-source:1.2.1'
-
     // Testing
     androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
 }

@@ -2,9 +2,11 @@ package com.xseth.homey.homey;
 
 import com.xseth.homey.BuildConfig;
 import com.xseth.homey.homey.models.Device;
+import com.xseth.homey.homey.models.Flow;
 import com.xseth.homey.homey.models.Homey;
 import com.xseth.homey.homey.models.Token;
 import com.xseth.homey.homey.models.User;
+import com.xseth.homey.homey.models.Zone;
 import com.xseth.homey.homey.services.CloudService;
 import com.xseth.homey.homey.services.HomeyService;
 import com.xseth.homey.utils.TokenInterceptor;
