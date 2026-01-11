@@ -175,15 +175,12 @@ public class MainActivity extends FragmentActivity implements MenuItem.OnMenuIte
     public boolean onMenuItemClick(MenuItem menuItem) {
         final int itemId = menuItem.getItemId();
 
-        switch (itemId) {
-            case R.id.device_refresh:
-                this.onOffAdapter.setLoading(true);
-                this.deviceViewModel.refreshDevices();
+        if (itemId == R.id.device_refresh) {
+            this.onOffAdapter.setLoading(true);
+            this.deviceViewModel.refreshDevices();
 
-                // Device refreshed, remove loading
-                runOnUiThread(() -> onOffAdapter.setLoading(false));
-
-                break;
+            // Device refreshed, remove loading
+            runOnUiThread(() -> onOffAdapter.setLoading(false));
         }
 
         drawer.getController().closeDrawer();
