@@ -57,7 +57,7 @@ public class VoiceCommandExecutor {
      */
     private void loadData() {
         try {
-            allDevices = api.getDevices();
+            allDevices = api.getAllDevices();
             allZones = api.getZones();
             allFlows = api.getFlows();
             

@@ -296,6 +296,32 @@ public class HomeyAPI {
     }
 
     /**
+     * Get all devices (not just favorites)
+     * @return map of all devices
+     */
+    public Map<String, Device> getAllDevices() {
+        // LinkedHashMap keeps order of keys
+        Map<String, Device> allDevices = new LinkedHashMap<>();
+
+        try {
+            Call<Map<String, Device>> call = homeyService.getDevices();
+            Map<String, Device> devices = call.execute().body();
+
+            if (devices != null) {
+                for (Map.Entry<String, Device> entry : devices.entrySet()) {
+                    Device device = entry.getValue();
+                    device.setCapability(); // Configure capability and onoff value
+                    allDevices.put(entry.getKey(), device);
+                }
+            }
+        } catch (IOException ioe){
+            Timber.e(ioe, "Failed to retrieve all devices");
+        }
+
+        return allDevices;
+    }
+
+    /**
      * Turn device on or off
      * @param device device to turn on or off
      */
