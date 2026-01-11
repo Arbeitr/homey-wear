@@ -22,6 +22,8 @@
     <string name="voice_audio_error">Audiofehler</string>
     <string name="voice_timeout">Zeitüberschreitung</string>
     <string name="voice_error_generic">Ein Fehler ist aufgetreten</string>
+    <string name="voice_client_error">Spracherkennung nicht verfügbar. Bitte Google App installieren.</string>
+    <string name="voice_busy_error">Spracherkennung beschäftigt. Bitte erneut versuchen.</string>
     <string name="voice_retry">Wiederholen</string>
     <string name="complication_label">Homey Sprache</string>
 </resources>

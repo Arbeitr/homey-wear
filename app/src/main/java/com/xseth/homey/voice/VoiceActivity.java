@@ -296,6 +296,15 @@ public class VoiceActivity extends FragmentActivity {
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
                     errorMessage = getString(R.string.voice_timeout);
                     break;
+                case SpeechRecognizer.ERROR_CLIENT:
+                    errorMessage = getString(R.string.voice_client_error);
+                    break;
+                case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                    errorMessage = getString(R.string.voice_busy_error);
+                    break;
+                case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                    errorMessage = getString(R.string.voice_permission_denied);
+                    break;
                 default:
                     errorMessage = getString(R.string.voice_error_generic);
                     break;
