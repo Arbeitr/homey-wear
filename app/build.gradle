@@ -85,6 +85,7 @@ dependencies {
 
     // UI
     implementation "com.google.android.material:material:$rootProject.materialVersion"
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     // Logging
     implementation 'com.jakewharton.timber:timber:5.0.1'

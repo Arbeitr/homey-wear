@@ -26,4 +26,5 @@
     <string name="voice_busy_error">Spracherkennung beschäftigt. Bitte erneut versuchen.</string>
     <string name="voice_retry">Wiederholen</string>
     <string name="complication_label">Homey Sprache</string>
+    <string name="no_devices">Keine Geräte in dieser Zone</string>
 </resources>
