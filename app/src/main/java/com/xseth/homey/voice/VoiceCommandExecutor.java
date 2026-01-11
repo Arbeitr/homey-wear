@@ -16,6 +16,11 @@ import timber.log.Timber;
  */
 public class VoiceCommandExecutor {
 
+    // Temperature constants
+    private static final double DEFAULT_TEMPERATURE = 20.0;
+    private static final double MIN_TEMPERATURE = 5.0;
+    private static final double MAX_TEMPERATURE = 30.0;
+
     /**
      * Result of command execution
      */
@@ -290,7 +295,7 @@ public class VoiceCommandExecutor {
                             currentTemp = updatedDevice.getCachedTargetTemperature();
                         }
                         if (currentTemp == null) {
-                            currentTemp = 20.0; // Default fallback
+                            currentTemp = DEFAULT_TEMPERATURE;
                         }
                     }
                     targetTemp = currentTemp + intent.getDegrees();
@@ -300,7 +305,7 @@ public class VoiceCommandExecutor {
                 }
 
                 // Clamp temperature to reasonable range
-                targetTemp = Math.max(5.0, Math.min(30.0, targetTemp));
+                targetTemp = Math.max(MIN_TEMPERATURE, Math.min(MAX_TEMPERATURE, targetTemp));
                 
                 api.setCapabilityValue(device.getId(), "target_temperature", targetTemp).execute();
                 device.setCachedTargetTemperature(targetTemp);

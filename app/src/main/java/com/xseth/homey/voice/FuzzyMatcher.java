@@ -12,6 +12,7 @@ import java.util.Set;
 public class FuzzyMatcher {
 
     private static final double MATCH_THRESHOLD = 0.65;
+    private static final double COMPOUND_MATCH_SCORE_MULTIPLIER = 0.95;
 
     /**
      * Match result containing score and match type
@@ -218,7 +219,7 @@ public class FuzzyMatcher {
             for (String qPart : queryParts) {
                 for (String cPart : candidateParts) {
                     double partScore = jaroWinkler(qPart, cPart);
-                    if (partScore > 0.80 && partScore > bestScore * 0.95) {
+                    if (partScore > 0.80 && partScore > bestScore * COMPOUND_MATCH_SCORE_MULTIPLIER) {
                         bestScore = partScore * 0.75;
                         bestMatchType = "compound";
                         bestMatchedId = candidateId;
