@@ -31,6 +31,10 @@ jobs:
           CLIENT_SECRET="${{ secrets.ATHOM_CLIENT_SECRET }}"
           EOF
       
+      - name: Create google-services.json
+        run: |
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > app/google-services.json
+      
       - name: Build debug APK
         run: ./gradlew assembleDebug
       
