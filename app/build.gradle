@@ -21,6 +21,10 @@ android {
         buildConfigField("String", "ATHOM_CLIENT_SECRET", properties.getProperty('CLIENT_SECRET'))
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         customDebugType {
             debuggable true
@@ -42,8 +46,6 @@ android {
                     'proguard-rules.pro'
             debuggable false
             jniDebuggable false
-            renderscriptDebuggable false
-            renderscriptOptimLevel 3
 
         }
     }
