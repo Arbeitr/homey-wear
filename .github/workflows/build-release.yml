@@ -24,8 +24,10 @@ jobs:
       
       - name: Create local.properties
         run: |
-          echo "CLIENT_ID=\"${{ secrets.ATHOM_CLIENT_ID }}\"" > local.properties
-          echo "CLIENT_SECRET=\"${{ secrets.ATHOM_CLIENT_SECRET }}\"" >> local.properties
+          cat > local.properties << 'EOF'
+          CLIENT_ID="${{ secrets.ATHOM_CLIENT_ID }}"
+          CLIENT_SECRET="${{ secrets.ATHOM_CLIENT_SECRET }}"
+          EOF
       
       - name: Build debug APK
         run: ./gradlew assembleDebug
