@@ -5,6 +5,10 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.wearable.authentication.OAuthClient;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+
+import androidx.wear.widget.WearableRecyclerView;
 
 import com.xseth.homey.MainActivity;
 import com.xseth.homey.R;
@@ -18,15 +22,25 @@ public class OAuth {
     private static OAuthClient mOAuthClient;
 
     /**
+     * Interface for OAuth callback UI updates
+     */
+    public interface OAuthUIHandler {
+        void onAuthSuccess();
+        void onAuthFailure();
+    }
+
+    /**
      * Class for handling OAUTH2 callbacks
      */
     private static class MyOAuthCallback extends OAuthClient.Callback {
 
         // Instance of activity starting OAuth
-        private MainActivity activity;
+        private Activity activity;
+        private OAuthUIHandler uiHandler;
 
-        private MyOAuthCallback(MainActivity activity){
+        private MyOAuthCallback(Activity activity, OAuthUIHandler uiHandler){
             this.activity = activity;
+            this.uiHandler = uiHandler;
         }
 
         @Override
@@ -41,11 +55,11 @@ public class OAuth {
                 try {
                     HomeyAPI.getAPI().setToken(token);
 
-                    // 'Remove' notifications and show default layout
-                    this.activity.runOnUiThread(() -> {
-                        this.activity.vOnOffList.setVisibility(View.VISIBLE);
-                        this.activity.notifications.setVisibility(View.GONE);
-                        this.activity.notificationsProgress.setVisibility(View.INVISIBLE);
+                    // Update UI on success
+                    activity.runOnUiThread(() -> {
+                        if (uiHandler != null) {
+                            uiHandler.onAuthSuccess();
+                        }
                     });
                 } catch (Exception e){
                     Timber.e(e, "Failed to parse Oauth code");
@@ -67,7 +81,11 @@ public class OAuth {
                 } catch (InterruptedException ignored) {}
 
                 utils.showConfirmationFailure(activity.getApplicationContext(), R.string.failure_authenticate);
-                activity.runOnUiThread(() -> this.activity.notificationsProgress.setVisibility(View.INVISIBLE));
+                activity.runOnUiThread(() -> {
+                    if (uiHandler != null) {
+                        uiHandler.onAuthFailure();
+                    }
+                });
             }).start();
         }
     }
@@ -82,14 +100,33 @@ public class OAuth {
     }
 
     /**
-     * Start OAUTH2 authorization procedure
+     * Start OAUTH2 authorization procedure for MainActivity
      */
     public static void sendAuthorization(MainActivity a){
+        sendAuthorization(a, new OAuthUIHandler() {
+            @Override
+            public void onAuthSuccess() {
+                a.vOnOffList.setVisibility(View.VISIBLE);
+                a.notifications.setVisibility(View.GONE);
+                a.notificationsProgress.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAuthFailure() {
+                a.notificationsProgress.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+
+    /**
+     * Start OAUTH2 authorization procedure with custom UI handler
+     */
+    public static void sendAuthorization(Activity activity, OAuthUIHandler uiHandler){
         HomeyAPI api = HomeyAPI.getAPI();
         String url = api.getLoginURL();
 
         Timber.i("Send authentication via url: %s", url);
-        mOAuthClient.sendAuthorizationRequest(Uri.parse(url), new MyOAuthCallback(a));
+        mOAuthClient.sendAuthorizationRequest(Uri.parse(url), new MyOAuthCallback(activity, uiHandler));
     }
 
     /**

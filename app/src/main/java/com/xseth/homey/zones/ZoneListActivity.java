@@ -33,7 +33,8 @@ import timber.log.Timber;
 /**
  * Activity showing list of zones for navigation
  */
-public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMenuItemClickListener {
+public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMenuItemClickListener,
+        View.OnClickListener {
 
     private WearableRecyclerView zoneList;
     private ZoneListAdapter zoneAdapter;
@@ -56,6 +57,8 @@ public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMen
 
         // View used for notifications
         notifications = findViewById(R.id.notification);
+        notifications.setOnClickListener(this);
+        
         notificationsProgress = notifications.findViewById(R.id.progressBar);
         utils.randomiseProgressBar(notificationsProgress);
 
@@ -136,6 +139,33 @@ public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMen
         super.onDestroy();
         OAuth.stopOAuth();
         ColorRunner.stopColorRunner();
+    }
+
+    @Override
+    public void onClick(View v) {
+        TextView message = notifications.findViewById(R.id.message);
+
+        // Check if login notification is shown
+        if(!message.getText().toString().equals(getResources().getString(R.string.login)))
+            return;
+
+        utils.showConfirmationPhone(this.getApplicationContext(), R.string.authenticate);
+        notificationsProgress.setVisibility(View.VISIBLE);
+
+        OAuth.sendAuthorization(this, new OAuth.OAuthUIHandler() {
+            @Override
+            public void onAuthSuccess() {
+                notificationsProgress.setVisibility(View.INVISIBLE);
+                notifications.setVisibility(View.GONE);
+                zoneList.setVisibility(View.VISIBLE);
+                loadZones();
+            }
+
+            @Override
+            public void onAuthFailure() {
+                notificationsProgress.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     @Override
