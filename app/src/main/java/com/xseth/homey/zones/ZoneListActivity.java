@@ -16,6 +16,7 @@ import androidx.wear.widget.drawer.WearableActionDrawerView;
 import androidx.wear.widget.drawer.WearableDrawerLayout;
 
 import com.xseth.homey.BuildConfig;
+import com.xseth.homey.MainActivity;
 import com.xseth.homey.R;
 import com.xseth.homey.homey.HomeyAPI;
 import com.xseth.homey.homey.models.Zone;
@@ -50,6 +51,11 @@ public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMen
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zone_list);
+
+        // Initialize static context and appPath needed by HomeyAPI and Token
+        MainActivity.context = this.getApplicationContext();
+        MainActivity.appPath = MainActivity.context.getFilesDir().getAbsolutePath();
+        Timber.d("onCreate: Set appPath to %s", MainActivity.appPath);
 
         // View used for rainbow background
         WearableDrawerLayout background = findViewById(R.id.zone_back);

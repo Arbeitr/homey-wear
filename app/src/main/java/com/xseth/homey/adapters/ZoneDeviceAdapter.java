@@ -122,7 +122,12 @@ public class ZoneDeviceAdapter extends RecyclerView.Adapter<ZoneDeviceAdapter.De
                     }
 
                     currentDevice.setOn(status);
-                    DeviceRepository.getInstance().update(currentDevice);
+                    
+                    // Update device repository if available (used by favorites view)
+                    DeviceRepository repo = DeviceRepository.getInstance();
+                    if (repo != null) {
+                        repo.update(currentDevice);
+                    }
                     
                     updateCardColor();
 

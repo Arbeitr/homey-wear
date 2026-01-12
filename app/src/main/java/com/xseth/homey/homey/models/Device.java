@@ -172,7 +172,17 @@ public class Device {
      * download the icon in bitmap form
      */
     public void fetchIconImage() {
+        if (this.iconObj == null) {
+            Timber.w("Device %s: iconObj is null, cannot fetch icon", this.name);
+            return;
+        }
+        
         String iconId = this.iconObj.get("id");
+        if (iconId == null || iconId.isEmpty()) {
+            Timber.w("Device %s: iconId is null or empty", this.name);
+            return;
+        }
+        
         final String strUrl = HomeyAPI.ICON_URL + iconId + "-128.png";
 
         try{
@@ -180,10 +190,13 @@ public class Device {
             URLConnection conn = url.openConnection();
 
             this.iconImage = BitmapFactory.decodeStream(conn.getInputStream());
+            if (this.iconImage == null) {
+                Timber.w("Device %s: Failed to decode icon from %s", this.name, strUrl);
+            }
         } catch (MalformedURLException mue) {
-            Timber.e(mue, "Error invalid iconUrl");
+            Timber.e(mue, "Device %s: Invalid iconUrl %s", this.name, strUrl);
         } catch (IOException ioe) {
-            Timber.e(ioe,"Error downloading icon from: %s", strUrl);
+            Timber.e(ioe, "Device %s: Error downloading icon from %s", this.name, strUrl);
         }
     }
 
