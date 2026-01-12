@@ -343,12 +343,32 @@ public class HomeyAPI {
      * @return map of zones
      */
     public Map<String, Zone> getZones() {
+        Timber.d("getZones: Starting API call");
         try {
             Call<Map<String, Zone>> call = homeyService.getZones();
-            Map<String, Zone> zones = call.execute().body();
-            return zones != null ? zones : new HashMap<>();
+            Timber.d("getZones: Executing API call");
+            Response<Map<String, Zone>> response = call.execute();
+            
+            Timber.d("getZones: Response code: %d", response.code());
+            if (!response.isSuccessful()) {
+                Timber.e("getZones: API call failed with code %d: %s", 
+                    response.code(), response.message());
+                return new HashMap<>();
+            }
+            
+            Map<String, Zone> zones = response.body();
+            if (zones == null) {
+                Timber.w("getZones: API returned null body");
+                return new HashMap<>();
+            }
+            
+            Timber.d("getZones: Successfully retrieved %d zones", zones.size());
+            return zones;
         } catch (IOException ioe) {
-            Timber.e(ioe, "Failed to retrieve zones");
+            Timber.e(ioe, "getZones: IOException - %s", ioe.getMessage());
+            return new HashMap<>();
+        } catch (Exception e) {
+            Timber.e(e, "getZones: Unexpected exception - %s", e.getMessage());
             return new HashMap<>();
         }
     }
@@ -358,12 +378,32 @@ public class HomeyAPI {
      * @return map of flows
      */
     public Map<String, Flow> getFlows() {
+        Timber.d("getFlows: Starting API call");
         try {
             Call<Map<String, Flow>> call = homeyService.getFlows();
-            Map<String, Flow> flows = call.execute().body();
-            return flows != null ? flows : new HashMap<>();
+            Timber.d("getFlows: Executing API call");
+            Response<Map<String, Flow>> response = call.execute();
+            
+            Timber.d("getFlows: Response code: %d", response.code());
+            if (!response.isSuccessful()) {
+                Timber.e("getFlows: API call failed with code %d: %s", 
+                    response.code(), response.message());
+                return new HashMap<>();
+            }
+            
+            Map<String, Flow> flows = response.body();
+            if (flows == null) {
+                Timber.w("getFlows: API returned null body");
+                return new HashMap<>();
+            }
+            
+            Timber.d("getFlows: Successfully retrieved %d flows", flows.size());
+            return flows;
         } catch (IOException ioe) {
-            Timber.e(ioe, "Failed to retrieve flows");
+            Timber.e(ioe, "getFlows: IOException - %s", ioe.getMessage());
+            return new HashMap<>();
+        } catch (Exception e) {
+            Timber.e(e, "getFlows: Unexpected exception - %s", e.getMessage());
             return new HashMap<>();
         }
     }

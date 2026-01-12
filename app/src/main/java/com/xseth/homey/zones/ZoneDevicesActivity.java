@@ -65,35 +65,63 @@ public class ZoneDevicesActivity extends FragmentActivity {
         
         new Thread(() -> {
             try {
+                Timber.d("loadDevices: Starting for zone %s (%s)", zoneName, zoneId);
                 HomeyAPI api = HomeyAPI.getAPI();
+                
+                // Wait for API to be fully authenticated
+                Timber.d("loadDevices: Waiting for HomeyAPI authentication...");
+                api.waitForHomeyAPI();
+                Timber.d("loadDevices: HomeyAPI authenticated, fetching all devices...");
+                
                 Map<String, Device> allDevices = api.getAllDevices();
+                Timber.d("loadDevices: Received %d total devices", allDevices != null ? allDevices.size() : 0);
+                
+                if (allDevices == null || allDevices.isEmpty()) {
+                    Timber.w("loadDevices: No devices returned from API");
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(View.GONE);
+                        emptyView.setText("Keine Geräte verfügbar");
+                        emptyView.setVisibility(View.VISIBLE);
+                    });
+                    return;
+                }
                 
                 List<Device> zoneDevices = new ArrayList<>();
+                int matchCount = 0;
                 for (Device device : allDevices.values()) {
                     if (zoneId.equals(device.getZoneId())) {
+                        matchCount++;
+                        Timber.d("loadDevices: Found device %s in zone %s", device.getName(), zoneName);
                         device.fetchIconImage();
                         zoneDevices.add(device);
                     }
                 }
+                
+                Timber.d("loadDevices: Found %d devices matching zone %s", matchCount, zoneName);
 
                 runOnUiThread(() -> {
                     progressBar.setVisibility(View.GONE);
                     
                     if (zoneDevices.isEmpty()) {
+                        Timber.d("loadDevices: No devices in this zone, showing empty view");
                         emptyView.setVisibility(View.VISIBLE);
                         deviceList.setVisibility(View.GONE);
                     } else {
+                        Timber.d("loadDevices: Setting %d devices to adapter", zoneDevices.size());
                         deviceAdapter.setDevices(zoneDevices);
                         emptyView.setVisibility(View.GONE);
                         deviceList.setVisibility(View.VISIBLE);
                     }
                 });
             } catch (Exception e) {
-                Timber.e(e, "Failed to load devices for zone");
+                Timber.e(e, "loadDevices: Failed to load devices - %s", e.getMessage());
                 runOnUiThread(() -> {
                     progressBar.setVisibility(View.GONE);
                     emptyView.setText(R.string.error);
                     emptyView.setVisibility(View.VISIBLE);
+                    android.widget.Toast.makeText(this, 
+                        "Fehler beim Laden der Geräte: " + e.getMessage(), 
+                        android.widget.Toast.LENGTH_LONG).show();
                 });
             }
         }).start();

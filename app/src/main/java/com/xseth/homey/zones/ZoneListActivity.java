@@ -65,19 +65,24 @@ public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMen
         // Verify authentication in background
         new Thread(() -> {
             try {
+                Timber.d("onCreate: Starting authentication check");
                 HomeyAPI api = HomeyAPI.getAPI();
 
                 if (api.isLoggedIn()) {
+                    Timber.d("onCreate: User is logged in, authenticating with Homey");
                     api.authenticateHomey();
+                    Timber.d("onCreate: Authentication successful, loading zones");
                     loadZones();
                 } else {
+                    Timber.w("onCreate: User not logged in, showing login notification");
                     OAuth.startOAuth(this);
                     setNotification(R.string.login, R.drawable.ic_login);
                 }
             } catch(UnknownHostException uhe){
+                Timber.e(uhe, "onCreate: No internet connection");
                 setNotification(R.string.no_internet, R.drawable.ic_cloud_off);
             } catch(Exception e) {
-                Timber.e(e);
+                Timber.e(e, "onCreate: Authentication error - %s", e.getMessage());
                 setNotification(R.string.error, R.drawable.ic_error);
             }
         }).start();
@@ -105,21 +110,47 @@ public class ZoneListActivity extends FragmentActivity implements MenuItem.OnMen
      * Load zones from HomeyAPI
      */
     private void loadZones() {
-        try {
-            HomeyAPI api = HomeyAPI.getAPI();
-            Map<String, Zone> zonesMap = api.getZones();
-            
-            List<Zone> zones = new ArrayList<>(zonesMap.values());
-            
-            runOnUiThread(() -> {
-                zoneAdapter.setZones(zones);
-                notifications.setVisibility(View.GONE);
-                zoneList.setVisibility(View.VISIBLE);
-            });
-        } catch (Exception e) {
-            Timber.e(e, "Failed to load zones");
-            runOnUiThread(() -> setNotification(R.string.error, R.drawable.ic_error));
-        }
+        new Thread(() -> {
+            try {
+                Timber.d("Starting loadZones()");
+                HomeyAPI api = HomeyAPI.getAPI();
+                
+                // Wait for API to be fully authenticated
+                Timber.d("Waiting for HomeyAPI authentication...");
+                api.waitForHomeyAPI();
+                Timber.d("HomeyAPI authenticated, fetching zones...");
+                
+                Map<String, Zone> zonesMap = api.getZones();
+                Timber.d("Received zones map with %d zones", zonesMap != null ? zonesMap.size() : 0);
+                
+                if (zonesMap == null || zonesMap.isEmpty()) {
+                    Timber.w("No zones returned from API");
+                    runOnUiThread(() -> {
+                        setNotification(R.string.error, R.drawable.ic_error);
+                        android.widget.Toast.makeText(this, "Keine Zonen gefunden", android.widget.Toast.LENGTH_LONG).show();
+                    });
+                    return;
+                }
+                
+                List<Zone> zones = new ArrayList<>(zonesMap.values());
+                Timber.d("Created zones list with %d items", zones.size());
+                
+                runOnUiThread(() -> {
+                    zoneAdapter.setZones(zones);
+                    notifications.setVisibility(View.GONE);
+                    zoneList.setVisibility(View.VISIBLE);
+                    Timber.d("UI updated with zones");
+                });
+            } catch (Exception e) {
+                Timber.e(e, "Failed to load zones - Exception: %s", e.getMessage());
+                runOnUiThread(() -> {
+                    setNotification(R.string.error, R.drawable.ic_error);
+                    android.widget.Toast.makeText(this, 
+                        "Fehler beim Laden der Zonen: " + e.getMessage(), 
+                        android.widget.Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
     }
 
     @Override
