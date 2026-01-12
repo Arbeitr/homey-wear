@@ -345,7 +345,8 @@ public class HomeyAPI {
     public Map<String, Zone> getZones() {
         try {
             Call<Map<String, Zone>> call = homeyService.getZones();
-            return call.execute().body();
+            Map<String, Zone> zones = call.execute().body();
+            return zones != null ? zones : new HashMap<>();
         } catch (IOException ioe) {
             Timber.e(ioe, "Failed to retrieve zones");
             return new HashMap<>();
@@ -359,7 +360,8 @@ public class HomeyAPI {
     public Map<String, Flow> getFlows() {
         try {
             Call<Map<String, Flow>> call = homeyService.getFlows();
-            return call.execute().body();
+            Map<String, Flow> flows = call.execute().body();
+            return flows != null ? flows : new HashMap<>();
         } catch (IOException ioe) {
             Timber.e(ioe, "Failed to retrieve flows");
             return new HashMap<>();
