@@ -139,13 +139,25 @@ public class Device {
             if(capabilities.contains(capability)) {
                 this.capability = capability;
 
-                if(!capability.equals("button"))
-                    this.on = Boolean.getBoolean(
-                            this.capabilitiesObj.get(capability).get("value").toString()
-                    );
-                else
+                if(!capability.equals("button")) {
+                    // Get the capability value object
+                    Map<String, Object> capabilityData = this.capabilitiesObj.get(capability);
+                    if (capabilityData != null && capabilityData.containsKey("value")) {
+                        Object valueObj = capabilityData.get("value");
+                        if (valueObj != null) {
+                            this.on = Boolean.parseBoolean(valueObj.toString());
+                        } else {
+                            Timber.w("Device %s: capability %s has null value", this.name, capability);
+                            this.on = false;
+                        }
+                    } else {
+                        Timber.w("Device %s: capability %s missing value field", this.name, capability);
+                        this.on = false;
+                    }
+                } else {
                     // Button contains no value, so default to true
                     this.on = true;
+                }
             }
         }
 
