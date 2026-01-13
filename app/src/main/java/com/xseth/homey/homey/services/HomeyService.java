@@ -1,7 +1,9 @@
 package com.xseth.homey.homey.services;
 
 import com.xseth.homey.homey.models.Device;
+import com.xseth.homey.homey.models.Flow;
 import com.xseth.homey.homey.models.User;
+import com.xseth.homey.homey.models.Zone;
 
 import java.util.List;
 import java.util.Map;
@@ -27,5 +29,21 @@ public interface HomeyService {
     @PUT("api/manager/devices/device/{deviceId}/capability/{capabilityId}")
     Call<Map<String, Object>> setCapability(@Path("deviceId") String deviceId, @Path("capabilityId") String
             capabilityId, @Body Map<String, Boolean> body);
+
+    @GET("api/manager/zones/zone/")
+    Call<Map<String, Zone>> getZones();
+
+    @GET("api/manager/flow/flow/")
+    Call<Map<String, Flow>> getFlows();
+
+    @POST("api/manager/flow/flow/{flowId}/trigger")
+    Call<Void> triggerFlow(@Path("flowId") String flowId);
+
+    @PUT("api/manager/devices/device/{deviceId}/capability/{capabilityId}")
+    Call<Map<String, Object>> setCapabilityValue(@Path("deviceId") String deviceId,
+        @Path("capabilityId") String capabilityId, @Body Map<String, Object> body);
+
+    @GET("api/manager/devices/device/{deviceId}")
+    Call<Device> getDevice(@Path("deviceId") String deviceId);
 
 }

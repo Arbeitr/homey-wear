@@ -4,15 +4,15 @@ Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
 android {
-    compileSdkVersion 36
+    compileSdk 36
     buildToolsVersion "35.0.0"
 
     defaultConfig {
         applicationId "com.xseth.homey"
-        minSdkVersion 23
+        minSdkVersion 30
         targetSdkVersion 36
-        versionCode 4
-        versionName "1.1.2"
+        versionCode 5
+        versionName "2.0.0"
 
         // should correspond to key/value pairs inside the file
         buildConfigField("String", "ATHOM_CLIENT_ID", properties.getProperty('CLIENT_ID'))
@@ -85,6 +85,7 @@ dependencies {
 
     // UI
     implementation "com.google.android.material:material:$rootProject.materialVersion"
+    implementation 'androidx.cardview:cardview:1.0.0'
 
     // Logging
     implementation 'com.jakewharton.timber:timber:5.0.1'

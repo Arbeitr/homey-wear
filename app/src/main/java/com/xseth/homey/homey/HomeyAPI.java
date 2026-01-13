@@ -2,9 +2,11 @@ package com.xseth.homey.homey;
 
 import com.xseth.homey.BuildConfig;
 import com.xseth.homey.homey.models.Device;
+import com.xseth.homey.homey.models.Flow;
 import com.xseth.homey.homey.models.Homey;
 import com.xseth.homey.homey.models.Token;
 import com.xseth.homey.homey.models.User;
+import com.xseth.homey.homey.models.Zone;
 import com.xseth.homey.homey.services.CloudService;
 import com.xseth.homey.homey.services.HomeyService;
 import com.xseth.homey.utils.TokenInterceptor;
@@ -294,6 +296,32 @@ public class HomeyAPI {
     }
 
     /**
+     * Get all devices (not just favorites)
+     * @return map of all devices
+     */
+    public Map<String, Device> getAllDevices() {
+        // LinkedHashMap keeps order of keys
+        Map<String, Device> allDevices = new LinkedHashMap<>();
+
+        try {
+            Call<Map<String, Device>> call = homeyService.getDevices();
+            Map<String, Device> devices = call.execute().body();
+
+            if (devices != null) {
+                for (Map.Entry<String, Device> entry : devices.entrySet()) {
+                    Device device = entry.getValue();
+                    device.setCapability(); // Configure capability and onoff value
+                    allDevices.put(entry.getKey(), device);
+                }
+            }
+        } catch (IOException ioe){
+            Timber.e(ioe, "Failed to retrieve all devices");
+        }
+
+        return allDevices;
+    }
+
+    /**
      * Turn device on or off
      * @param device device to turn on or off
      */
@@ -308,5 +336,111 @@ public class HomeyAPI {
                 device.getCapability(),
                 jsonParams
         );
+    }
+
+    /**
+     * Get all zones
+     * @return map of zones
+     */
+    public Map<String, Zone> getZones() {
+        Timber.d("getZones: Starting API call");
+        try {
+            Call<Map<String, Zone>> call = homeyService.getZones();
+            Timber.d("getZones: Executing API call");
+            Response<Map<String, Zone>> response = call.execute();
+            
+            Timber.d("getZones: Response code: %d", response.code());
+            if (!response.isSuccessful()) {
+                Timber.e("getZones: API call failed with code %d: %s", 
+                    response.code(), response.message());
+                return new HashMap<>();
+            }
+            
+            Map<String, Zone> zones = response.body();
+            if (zones == null) {
+                Timber.w("getZones: API returned null body");
+                return new HashMap<>();
+            }
+            
+            Timber.d("getZones: Successfully retrieved %d zones", zones.size());
+            return zones;
+        } catch (IOException ioe) {
+            Timber.e(ioe, "getZones: IOException - %s", ioe.getMessage());
+            return new HashMap<>();
+        } catch (Exception e) {
+            Timber.e(e, "getZones: Unexpected exception - %s", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * Get all flows
+     * @return map of flows
+     */
+    public Map<String, Flow> getFlows() {
+        Timber.d("getFlows: Starting API call");
+        try {
+            Call<Map<String, Flow>> call = homeyService.getFlows();
+            Timber.d("getFlows: Executing API call");
+            Response<Map<String, Flow>> response = call.execute();
+            
+            Timber.d("getFlows: Response code: %d", response.code());
+            if (!response.isSuccessful()) {
+                Timber.e("getFlows: API call failed with code %d: %s", 
+                    response.code(), response.message());
+                return new HashMap<>();
+            }
+            
+            Map<String, Flow> flows = response.body();
+            if (flows == null) {
+                Timber.w("getFlows: API returned null body");
+                return new HashMap<>();
+            }
+            
+            Timber.d("getFlows: Successfully retrieved %d flows", flows.size());
+            return flows;
+        } catch (IOException ioe) {
+            Timber.e(ioe, "getFlows: IOException - %s", ioe.getMessage());
+            return new HashMap<>();
+        } catch (Exception e) {
+            Timber.e(e, "getFlows: Unexpected exception - %s", e.getMessage());
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * Trigger a flow
+     * @param flowId flow ID to trigger
+     */
+    public Call<Void> triggerFlow(String flowId) {
+        return homeyService.triggerFlow(flowId);
+    }
+
+    /**
+     * Get a specific device
+     * @param deviceId device ID
+     * @return device
+     */
+    public Device getDevice(String deviceId) {
+        try {
+            Call<Device> call = homeyService.getDevice(deviceId);
+            return call.execute().body();
+        } catch (IOException ioe) {
+            Timber.e(ioe, "Failed to retrieve device");
+            return null;
+        }
+    }
+
+    /**
+     * Set capability value for a device
+     * @param deviceId device ID
+     * @param capabilityId capability ID
+     * @param value value to set
+     * @return result
+     */
+    public Call<Map<String, Object>> setCapabilityValue(String deviceId, String capabilityId, Object value) {
+        Map<String, Object> jsonParams = new HashMap<>();
+        jsonParams.put("value", value);
+        return homeyService.setCapabilityValue(deviceId, capabilityId, jsonParams);
     }
 }

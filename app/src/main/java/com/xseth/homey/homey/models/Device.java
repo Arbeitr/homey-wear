@@ -47,6 +47,16 @@ public class Device {
     @NonNull
     public String capability;
 
+    // Zone ID where this device is located
+    @SerializedName("zone")
+    private String zoneId;
+
+    // Zone name (mapped from zones)
+    private String zoneName;
+
+    // Cached target temperature for relative changes
+    private Double cachedTargetTemperature;
+
     // Capabilities Object returned by API
     @Ignore
     @SerializedName("capabilitiesObj")
@@ -129,13 +139,25 @@ public class Device {
             if(capabilities.contains(capability)) {
                 this.capability = capability;
 
-                if(!capability.equals("button"))
-                    this.on = Boolean.getBoolean(
-                            this.capabilitiesObj.get(capability).get("value").toString()
-                    );
-                else
+                if(!capability.equals("button")) {
+                    // Get the capability value object
+                    Map<String, Object> capabilityData = this.capabilitiesObj.get(capability);
+                    if (capabilityData != null && capabilityData.containsKey("value")) {
+                        Object valueObj = capabilityData.get("value");
+                        if (valueObj != null) {
+                            this.on = Boolean.parseBoolean(valueObj.toString());
+                        } else {
+                            Timber.w("Device %s: capability %s has null value", this.name, capability);
+                            this.on = false;
+                        }
+                    } else {
+                        Timber.w("Device %s: capability %s missing value field", this.name, capability);
+                        this.on = false;
+                    }
+                } else {
                     // Button contains no value, so default to true
                     this.on = true;
+                }
             }
         }
 
@@ -150,7 +172,17 @@ public class Device {
      * download the icon in bitmap form
      */
     public void fetchIconImage() {
+        if (this.iconObj == null) {
+            Timber.w("Device %s: iconObj is null, cannot fetch icon", this.name);
+            return;
+        }
+        
         String iconId = this.iconObj.get("id");
+        if (iconId == null || iconId.isEmpty()) {
+            Timber.w("Device %s: iconId is null or empty", this.name);
+            return;
+        }
+        
         final String strUrl = HomeyAPI.ICON_URL + iconId + "-128.png";
 
         try{
@@ -158,10 +190,13 @@ public class Device {
             URLConnection conn = url.openConnection();
 
             this.iconImage = BitmapFactory.decodeStream(conn.getInputStream());
+            if (this.iconImage == null) {
+                Timber.w("Device %s: Failed to decode icon from %s", this.name, strUrl);
+            }
         } catch (MalformedURLException mue) {
-            Timber.e(mue, "Error invalid iconUrl");
+            Timber.e(mue, "Device %s: Invalid iconUrl %s", this.name, strUrl);
         } catch (IOException ioe) {
-            Timber.e(ioe,"Error downloading icon from: %s", strUrl);
+            Timber.e(ioe, "Device %s: Error downloading icon from %s", this.name, strUrl);
         }
     }
 
@@ -198,6 +233,54 @@ public class Device {
      */
     public boolean isButton(){
         return this.getCapability().equals("button");
+    }
+
+    /**
+     * Get zone ID
+     * @return zone ID where device is located
+     */
+    public String getZoneId() {
+        return zoneId;
+    }
+
+    /**
+     * Set zone ID
+     * @param zoneId zone ID to set
+     */
+    public void setZoneId(String zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    /**
+     * Get zone name
+     * @return zone name
+     */
+    public String getZoneName() {
+        return zoneName;
+    }
+
+    /**
+     * Set zone name
+     * @param zoneName zone name to set
+     */
+    public void setZoneName(String zoneName) {
+        this.zoneName = zoneName;
+    }
+
+    /**
+     * Get cached target temperature
+     * @return cached target temperature
+     */
+    public Double getCachedTargetTemperature() {
+        return cachedTargetTemperature;
+    }
+
+    /**
+     * Set cached target temperature
+     * @param cachedTargetTemperature target temperature to cache
+     */
+    public void setCachedTargetTemperature(Double cachedTargetTemperature) {
+        this.cachedTargetTemperature = cachedTargetTemperature;
     }
 
     /**
